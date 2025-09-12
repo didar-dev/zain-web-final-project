@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import Cookies from "js-cookie";
 import { redirect } from "next/navigation";
 import { useState } from "react";
+import RevalidatePath from "@/actions";
 
 export function LoginForm({
   className,
@@ -32,6 +33,8 @@ export function LoginForm({
     if (result.success) {
       const accessToken = result.token;
       Cookies.set("accessToken", accessToken, { expires: 7 });
+      RevalidatePath("/");
+      // redirect to home page
       redirect("/");
     }
   };
