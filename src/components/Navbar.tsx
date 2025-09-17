@@ -16,7 +16,7 @@ export default function Navbar({ profile }: { profile: any }) {
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
         {/* Logo / Brand */}
         <div className="text-lg font-semibold">
-          <Link href="/">MyApp</Link>
+          <Link href="/">Online Courses</Link>
         </div>
 
         {/* Right side */}
