@@ -1,6 +1,8 @@
 import Link from "next/link";
 import React from "react";
 
+///TODO , fetch courses and display them 
+
 export default function page() {
   return (
     <div className="w-full">
