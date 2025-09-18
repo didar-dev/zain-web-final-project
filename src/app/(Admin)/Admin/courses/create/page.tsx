@@ -1,22 +1,35 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import Cookies from "js-cookie";
+import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-export default function page() {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState(undefined as number | undefined);
-  const [image, setImage] = useState<File | null>(null);
+import { toast } from "sonner";
 
-  const CreateCourseHandler = async () => {
+type FormValues = {
+  title: string;
+  description: string;
+  price?: number;
+  image?: FileList;
+};
+
+export default function Page() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm<FormValues>();
+
+  const onSubmit = async (data: FormValues) => {
     const accessToken = Cookies.get("accessToken");
     const formdata = new FormData();
-    formdata.append("title", title);
-    formdata.append("description", description);
-    if (price) formdata.append("price", price.toString());
-    if (image) formdata.append("image", image);
+    formdata.append("title", data.title);
+    formdata.append("description", data.description);
+    if (data.price) formdata.append("price", data.price.toString());
+    if (data.image && data.image[0]) formdata.append("image", data.image[0]);
+
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/courses/create`,
       {
@@ -27,47 +40,59 @@ export default function page() {
         body: formdata,
       }
     );
-    const data = await res.json();
-    if (data?.success) {
-      alert("Course created successfully");
+
+    const result = await res.json();
+    if (result?.success) {
+      toast.success("Course created successfully!");
+      reset();
     }
   };
 
   return (
     <div className="flex flex-col">
       <h1 className="text-2xl font-bold mb-4">Create New Course</h1>
-      <form
-        className="space-y-4 max-w-lg"
-        onSubmit={(e) => {
-          e.preventDefault();
-          CreateCourseHandler();
-        }}
-      >
-        <Input
-          type="text"
-          value={title}
-          placeholder="Course Title"
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <Textarea
-          placeholder="Course Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
+
+      <form className="space-y-4 max-w-lg" onSubmit={handleSubmit(onSubmit)}>
+        {/* Title */}
+        <div>
+          <Input
+            type="text"
+            placeholder="Course Title"
+            {...register("title", { required: "Title is required" })}
+          />
+          {errors.title && (
+            <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>
+          )}
+        </div>
+
+        {/* Description */}
+        <div>
+          <Textarea
+            placeholder="Course Description"
+            {...register("description", {
+              required: "Description is required",
+            })}
+          />
+          {errors.description && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.description.message}
+            </p>
+          )}
+        </div>
+
+        {/* Price */}
         <Input
           type="number"
-          value={price}
           placeholder="Course Price"
-          onChange={(e) => setPrice(Number(e.target.value))}
+          {...register("price", { valueAsNumber: true })}
         />
-        <Input
-          type="file"
-          value={""}
-          placeholder="Course Image"
-          accept="image/*"
-          onChange={(e) => setImage(e.target.files ? e.target.files[0] : null)}
-        />
-        <Button type="submit">Create Course</Button>
+
+        {/* Image */}
+        <Input type="file" accept="image/*" {...register("image")} />
+
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Creating..." : "Create Course"}
+        </Button>
       </form>
     </div>
   );
