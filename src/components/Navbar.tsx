@@ -24,6 +24,15 @@ export default function Navbar({ profile }: { profile: any }) {
           {profile?.id ? (
             <>
               <span className="text-sm text-gray-300">{profile.email}</span>
+              {profile.role === "ADMIN" && (
+                <Link
+                  href="/Admin"
+                  className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-md text-sm"
+                >
+                  Dashboard
+                </Link>
+              )}
+
               <button
                 onClick={onLogout}
                 className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-md text-sm"

@@ -31,7 +31,7 @@ export default function Page() {
     if (data.image && data.image[0]) formdata.append("image", data.image[0]);
 
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/courses/create`,
+      `${process.env.NEXT_PUBLIC_API_URL}/admin/courses/create`,
       {
         method: "POST",
         headers: {
